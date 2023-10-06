@@ -5,7 +5,7 @@ import sys
 import winreg
 import pefile
 import argparse
-from pyuac import main_requires_admin
+from pyuac import isUserAdmin, runAsAdmin
 
 def read_bytes(file_path, location, n):
     with open(file_path, "rb") as file:
@@ -201,29 +201,34 @@ def scan_directory(directory):
                 n_error = n_error + 1
                 
             print_update()
-    print()
+    print(f"finished scanning {directory}")
 
-@main_requires_admin
 def main(): 
-    parser = argparse.ArgumentParser(description="Anti-Unnamed-Virus-Tool")
-    parser.add_argument('--file', help='Checks the specified file and removes the virus if found')
-    parser.add_argument('--scan', nargs='+', help="Scans all .exe files in the specified directories. Multiple ones possible with --scan 'C:\\\\' 'D:\\\\' 'E:\\\\'")
-    parser.add_argument('--add', action='store_true', help="Adds a 'Scan File' entry to the file explorer context menu")
-    parser.add_argument('--remove', action='store_true', help="Removes the 'Scan File' entry from the context menu")
+    try:
+        parser = argparse.ArgumentParser(description="Anti-Unnamed-Virus-Tool")
+        parser.add_argument('--file', help='Checks the specified file and removes the virus if found')
+        parser.add_argument('--scan', nargs='+', help="Scans all .exe files in the specified directories. Multiple ones possible with --scan 'C:\\\\' 'D:\\\\' 'E:\\\\'")
+        parser.add_argument('--add', action='store_true', help="Adds a 'Scan File' entry to the file explorer context menu")
+        parser.add_argument('--remove', action='store_true', help="Removes the 'Scan File' entry from the context menu")
 
-    args = parser.parse_args()
-    
-    if args.file:
-        check_file(args.file)
-    elif args.add:    
-        add_to_context_menu()
-    elif args.remove:    
-        remove_from_context_menu()
-    elif args.scan:
-        for directory in args.scan:
-            scan_directory(directory)
-    else:
-        parser.print_help()
+        args = parser.parse_args()
+        
+        if args.file:
+            check_file(args.file)
+        elif args.add:    
+            add_to_context_menu()
+        elif args.remove:    
+            remove_from_context_menu()
+        elif args.scan:
+            for directory in args.scan:
+                scan_directory(directory)
+        else:
+            parser.print_help()
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
-    main()
+    if not isUserAdmin():
+        runAsAdmin()
+    else:
+        main()
