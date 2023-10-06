@@ -176,6 +176,9 @@ def check_file(file):
             print("You might want to scan your whole PC with --scan 'C:\\\\' 'D:\\\\' (and all your other drives).")
             os.system("pause")
     except Exception as e:
+        if not isUserAdmin(): # attempt as admin
+            runAsAdmin()
+            
         print(e)
         os.system("pause")
 
@@ -220,15 +223,16 @@ def main():
         elif args.remove:    
             remove_from_context_menu()
         elif args.scan:
-            for directory in args.scan:
-                scan_directory(directory)
+            # require admin for full scan
+            if not isUserAdmin():
+                runAsAdmin()
+            else:
+                for directory in args.scan:
+                    scan_directory(directory)
         else:
             parser.print_help()
     except Exception as e:
         print(e)
 
 if __name__ == "__main__":
-    if not isUserAdmin():
-        runAsAdmin()
-    else:
-        main()
+    main()
