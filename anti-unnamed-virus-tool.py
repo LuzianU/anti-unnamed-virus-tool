@@ -201,6 +201,7 @@ def scan_directory(directory):
                 n_error = n_error + 1
                 
             print_update()
+    print()
 
 @main_requires_admin
 def main(): 
