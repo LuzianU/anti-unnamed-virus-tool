@@ -229,6 +229,7 @@ def main():
             else:
                 for directory in args.scan:
                     scan_directory(directory)
+                os.system("pause")
         else:
             parser.print_help()
     except Exception as e:
